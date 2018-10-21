@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible"
+          content="ie=edge">
+
+    <title>AutoCompleter</title>
+    <link rel="stylesheet"
+          type="text/css"
+          href="https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.css">
+</head>
+
+<body>
+    <input class="awesomplete"
+           type="text"
+           id="myinput"
+           data-list="Java, JavaScript, Node.js" />
+
+    <script type="text/javascript"
+            src="https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.min.js"></script>
+    <script type="text/javascript">
+        let input = document.getElementById("myinput");
+        let awesomplete = new Awesomplete(input, {
+            minChars: 1
+        });
+        setTimeout(function () {
+            awesomplete.list = ["Python", "C++", "C"];
+            awesomplete.evaluate();
+
+        }, 3000);
+
+    </script>
+
+</body>
+
+</html>
