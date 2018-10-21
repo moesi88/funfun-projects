@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        *,
+        *:before,
+        *:after {
+          box-sizing: border-box;
+          margin: 0;
+          outline: none;
+        }
+        
+        html,
+        body {
+          height: 100vh;
+        }
+        
+        body {
+          text-align: center;
+          font: 20vmin sans-serif;
+          font-weight: bold;
+          overflow: hidden;
+          background: #333;
+        }
+        
+        .split-text {
+          background: lightgreen;
+          position: relative;
+          width: 100vw;
+          overflow: hidden;
+          height: 50vh;
+          line-height: 1em;
+        }
+        .split-text > .text {
+          position: absolute;
+          left: 50%;
+          -webkit-transform: translateX(-50%);
+                  transform: translateX(-50%);
+        }
+        .split-text:nth-child(1) > .text {
+          bottom: -10vmin;
+        }
+        .split-text:nth-child(2) > .text {
+          top: -10vmin;
+        }
+        
+        .front,
+        .back {
+          -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+          -webkit-tap-highlight-color: transparent;
+          -moz-user-select: none;
+           -ms-user-select: none;
+               user-select: none;
+          -webkit-user-select: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 1;
+        }
+        
+        .front {
+          color: darkorange;
+        }
+        .front > .split-text:nth-child(1) .text {
+          color: orange;
+        }
+        
+        .back {
+          color: olive;
+        }
+        .back > .split-text {
+          background: orange;
+        }
+        .back > .split-text:nth-child(1) .text {
+          color: yellowgreen;
+        }
+        
+        .active {
+          z-index: 2;
+        }
+        .active .split-text {
+          transition: 1s cubic-bezier(0.6, 0.04, 0.98, 0.335);
+        }
+        .active--1 .split-text:nth-child(1) {
+          -webkit-transform: translateY(-100%) translateZ(0);
+                  transform: translateY(-100%) translateZ(0);
+        }
+        .active--1 .split-text:nth-child(2) {
+          -webkit-transform: translateY(100%) translateZ(0);
+                  transform: translateY(100%) translateZ(0);
+        }
+        .active--2 .split-text:nth-child(1) {
+          -webkit-transform: translate3d(-100%, 0, 0);
+                  transform: translate3d(-100%, 0, 0);
+        }
+        .active--2 .split-text:nth-child(2) {
+          -webkit-transform: translate3d(100%, 0, 0);
+                  transform: translate3d(100%, 0, 0);
+        }
+        .active--3 .split-text:nth-child(1) {
+          -webkit-transform: translate3d(100%, 0, 0);
+                  transform: translate3d(100%, 0, 0);
+        }
+        .active--3 .split-text:nth-child(2) {
+          -webkit-transform: translate3d(-100%, 0, 0);
+                  transform: translate3d(-100%, 0, 0);
+        }
+        
+        .behind {
+          z-index: 0;
+        }
+        
+        .ready {
+          cursor: pointer;
+        }
+        
+          
+    </style>
+</head>
+<body>
+    <div class="front ready" data-text="Hello" role="button">
+        <div class="split-text" aria-hidden="true">
+          <div class="text"></div>
+        </div>
+        <div class="split-text">
+          <div class="text"></div>
+        </div>
+      </div>
+      
+      <div class="back behind" data-text="World" role="button">
+        <div class="split-text" aria-hidden="true">
+          <div class="text"></div>
+        </div>
+        <div class="split-text">
+          <div class="text"></div>
+        </div>
+      </div>
+
+
+      <script>
+        ; {
+            const
+              $front = document.querySelector('.front'),
+              $back = document.querySelector('.back'),
+              activeTypes = ['active--1', 'active--2', 'active--3'];
+          
+            function runAnimation(self, other) {
+              if (self.classList.contains('active')) return;
+          
+              //other.classList.remove(...activeTypes); // IE11 doesn't understand
+              activeTypes.forEach(item => other.classList.remove(item)); // Support IE11 version
+              self.classList.remove('ready');
+              let activeType = activeTypes[(Math.random() * activeTypes.length | 0)];
+              //self.classList.add('active', activeType); // IE11 doesn't understand
+              self.classList.add('active');
+              self.classList.add(activeType); // Support IE11 version
+            }
+          
+            function animationEnd(self, other) {
+              self.classList.add('behind');
+              self.classList.remove('active');
+              activeTypes.forEach(item => self.classList.remove(item));
+              other.classList.remove('behind');
+              other.classList.add('ready');
+            }
+          
+            (function renderTheTextToThePage() {
+              const
+                frontText = $front.getAttribute('data-text'),
+                backText = $back.getAttribute('data-text'),
+                $frontTexts = [].slice.call($front.querySelectorAll('.text')),
+                $backTexts = [].slice.call($back.querySelectorAll('.text'));
+          
+              $frontTexts.forEach(item => item.textContent = frontText);
+              $backTexts.forEach(item => item.textContent = backText);
+            })();
+          
+            // Thank you Babel
+            $front.addEventListener('click', e => runAnimation($front, $back));
+            $back.addEventListener('click', e => runAnimation($back, $front));
+          
+            $front.addEventListener('transitionend', e => animationEnd($front, $back), false);
+            $back.addEventListener('transitionend', e => animationEnd($back, $front), false);
+          
+            // Fastclick for touch devices
+            if ('addEventListener' in document) {
+              document.addEventListener('DOMContentLoaded', function() {
+                FastClick.attach(document.body);
+              }, false);
+            }
+          };
+      </script>
+</body>
+</html>
